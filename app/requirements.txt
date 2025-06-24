@@ -1,0 +1,15 @@
+langgraph
+langchain_openai
+langchain_community
+langchain_anthropic
+pinecone-client
+langchain-pinecone
+pypdf
+langchain-text-splitters
+langchain-core
+fastapi
+pydantic
+uvicorn
+anthropic
+python-dotenv
+python-multipart
