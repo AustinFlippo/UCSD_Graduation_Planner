@@ -35,7 +35,7 @@ const drive = google.drive({ version: 'v3' });
 // POST /api/export/google-sheets
 router.post('/google-sheets', async (req, res) => {
   try {
-    const { schedule, yearLabels } = req.body;
+    const { schedule, yearLabels, studentName } = req.body;
 
     if (!schedule || !yearLabels) {
       return res.status(400).json({ error: 'Missing schedule or yearLabels data' });
@@ -44,12 +44,13 @@ router.post('/google-sheets', async (req, res) => {
     // Get authenticated client
     const authClient = await auth.getClient();
 
-    // Create a new spreadsheet
+    // Create a new spreadsheet with student name
+    const titleName = studentName || 'Student';
     const createResponse = await sheets.spreadsheets.create({
       auth: authClient,
       resource: {
         properties: {
-          title: `Academic Planner - ${new Date().toLocaleDateString()}`,
+          title: `${titleName}'s Audit - ${new Date().toLocaleDateString()}`,
         },
         sheets: [{
           properties: {

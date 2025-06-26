@@ -197,6 +197,9 @@ const CoursePlannerContainer = ({ parsedCourseData = { sections: [], metadata: {
     try {
       setLoading(true);
       
+      // Get student name from parsed course data
+      const studentName = parsedCourseData?.metadata?.studentName || 'Student';
+      
       const response = await fetch('http://localhost:5050/api/export/google-sheets', {
         method: 'POST',
         headers: {
@@ -205,6 +208,7 @@ const CoursePlannerContainer = ({ parsedCourseData = { sections: [], metadata: {
         body: JSON.stringify({
           schedule,
           yearLabels,
+          studentName,
         }),
       });
 

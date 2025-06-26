@@ -67,11 +67,25 @@ const WelcomePopup = () => {
 
             {/* Feature 3: Course Search */}
             <div className="bg-green-50 rounded-lg p-5 border border-green-200">
-              <h3 className="text-xl font-bold text-green-900 mb-3">
-                Course Search
-              </h3>
+              <div className="flex items-center mb-3">
+                <h3 className="text-xl font-bold text-green-900">
+                  Course Search
+                </h3>
+                <div className="relative ml-2 group">
+                  <div className="w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold cursor-help">
+                    ?
+                  </div>
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-64 bg-gray-800 text-white text-sm rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[9999]">
+                    Search courses, drag them into the course planner, double click to view more information about the course.
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800"></div>
+                  </div>
+                </div>
+              </div>
               <p className="text-green-800 leading-relaxed">
                 Search for UCSD courses by name, keyword, or course ID. View course descriptions, enrollment times, and RateMyProfessor scores to make informed choices.
+              </p>
+              <p className="text-green-700 text-sm mt-2 italic">
+                Tip: Search courses, drag them into the course planner, double click to view more information about the course.
               </p>
             </div>
 

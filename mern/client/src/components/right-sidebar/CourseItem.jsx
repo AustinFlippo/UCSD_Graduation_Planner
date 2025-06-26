@@ -1,12 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 
 const CourseItem = ({ course, onDragStart, onDragEnd, onDoubleClick }) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragStart = (e) => {
+    setIsDragging(true);
+    onDragStart(e, course);
+  };
+
+  const handleDragEnd = (e) => {
+    setIsDragging(false);
+    onDragEnd(e);
+  };
+
   return (
     <div
-      className="p-2 bg-gray-50 border border-gray-200 rounded-lg cursor-move hover:bg-gray-100"
+      className={`p-2 bg-gray-50 border rounded-lg cursor-move hover:bg-gray-100 transition-all duration-200 ${
+        isDragging 
+          ? 'border-blue-500 border-2 bg-blue-50 opacity-100 shadow-lg' 
+          : 'border-gray-200'
+      }`}
       draggable
-      onDragStart={(e) => onDragStart(e, course)}
-      onDragEnd={onDragEnd}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       onDoubleClick={() => onDoubleClick?.(course)}
     >
       <div className="flex justify-between items-center">

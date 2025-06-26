@@ -63,6 +63,73 @@ const SidebarAuditTracker = ({ auditData, onAuditDataUpdate }) => {
         currentElement = currentElement.nextElementSibling;
       }
       
+      // Function to extract student name from degree audit
+      function extractStudentName(doc) {
+        // Try to find student name in various common locations in degree audit HTML
+        
+        // Look for student information section
+        const studentInfoSelectors = [
+          '.studentInfo',
+          '.student-info', 
+          '.student-name',
+          '.studentName',
+          '.name',
+          '.student_name'
+        ];
+        
+        for (const selector of studentInfoSelectors) {
+          const element = doc.querySelector(selector);
+          if (element) {
+            const text = element.textContent.trim();
+            if (text && text.length > 2) {
+              return text;
+            }
+          }
+        }
+        
+        // Look for patterns like "Student: [Name]" or "Name: [Name]"
+        const textContent = doc.body ? doc.body.textContent : '';
+        const namePatterns = [
+          /Student:\s*([^\n\r]+)/i,
+          /Name:\s*([^\n\r]+)/i,
+          /Student Name:\s*([^\n\r]+)/i
+        ];
+        
+        for (const pattern of namePatterns) {
+          const match = textContent.match(pattern);
+          if (match && match[1]) {
+            const name = match[1].trim();
+            if (name.length > 2 && name.length < 100) {
+              return name;
+            }
+          }
+        }
+        
+        // Look in page title or header
+        const title = doc.title;
+        if (title && title.includes('Degree Audit')) {
+          const titleMatch = title.match(/([A-Z][a-z]+\s+[A-Z][a-z]+)/);
+          if (titleMatch) {
+            return titleMatch[1];
+          }
+        }
+        
+        // Look for elements containing name-like patterns
+        const allElements = doc.querySelectorAll('*');
+        for (const element of allElements) {
+          const text = element.textContent?.trim();
+          if (text && text.length > 5 && text.length < 50) {
+            // Match pattern like "Firstname Lastname" (capitalize first letters)
+            const nameMatch = text.match(/^([A-Z][a-z]+\s+[A-Z][a-z]+)(?:\s|$)/);
+            if (nameMatch && !text.includes('Degree') && !text.includes('Audit') && !text.includes('University')) {
+              return nameMatch[1];
+            }
+          }
+        }
+        
+        return 'Student'; // Default fallback
+      }
+
       // Function to find EARNED units from the 180-unit requirement section
       function calculateUnitsCompleted(doc) {
         // Find the main 180-unit requirement section
@@ -234,6 +301,9 @@ const SidebarAuditTracker = ({ auditData, onAuditDataUpdate }) => {
       // Calculate total units completed
       const unitsCompleted = calculateUnitsCompleted(doc);
       
+      // Extract student name
+      const studentName = extractStudentName(doc);
+      
       // Create audit result with same structure as demo
       const auditResult = {
         sections: newAuditSections,
@@ -243,6 +313,7 @@ const SidebarAuditTracker = ({ auditData, onAuditDataUpdate }) => {
           inProgressSections: newAuditSections.filter(s => s.status === 'in_progress').length,
           notFulfilledSections: newAuditSections.filter(s => s.status === 'not_fulfilled').length,
           unitsCompleted: unitsCompleted,
+          studentName: studentName,
           parseTimestamp: new Date().toISOString(),
           parsedBy: 'client'
         }
@@ -303,6 +374,15 @@ const SidebarAuditTracker = ({ auditData, onAuditDataUpdate }) => {
             Upload an HTML degree audit to see your graduation progress.
           </p>
         </div>
+
+        {/* Student Name Display */}
+        {auditData?.metadata?.studentName && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="text-sm font-semibold text-blue-900">
+              {auditData.metadata.studentName}'s Audit
+            </h3>
+          </div>
+        )}
 
         {/* Loading/Error State */}
         {loading && (
