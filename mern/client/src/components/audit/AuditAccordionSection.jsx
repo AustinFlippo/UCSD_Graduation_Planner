@@ -30,39 +30,13 @@ const AuditAccordionSection = ({ title, status, items }) => {
     return true;
   };
 
-  const getStatusConfig = (status) => {
-    switch (status) {
-      case 'fulfilled':
-        return {
-          badge: 'FULFILLED',
-          badgeStyle: 'bg-green-100 text-green-800 border border-green-200',
-          icon: '✅'
-        };
-      case 'in_progress':
-        return {
-          badge: 'IN PROGRESS',
-          badgeStyle: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-          icon: '🟨'
-        };
-      case 'not_fulfilled':
-        return {
-          badge: 'NOT FULFILLED',
-          badgeStyle: 'bg-red-100 text-red-800 border border-red-200',
-          icon: '❌'
-        };
-      default:
-        return {
-          badge: 'UNKNOWN',
-          badgeStyle: 'bg-gray-100 text-gray-800 border border-gray-200',
-          icon: '❓'
-        };
-    }
-  };
-
-  const statusConfig = getStatusConfig(status);
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className={`rounded-lg overflow-hidden ${
+      status === 'fulfilled' 
+        ? 'bg-green-100 border border-green-200' 
+        : 'border border-gray-200 bg-white'
+    }`}>
       {/* Header - Always Visible */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -75,23 +49,17 @@ const AuditAccordionSection = ({ title, status, items }) => {
               {isExpanded ? '▼' : '▶'}
             </span>
             
+            {/* Completed Checkmark */}
+            {status === 'fulfilled' && (
+              <span className="text-green-600 font-bold text-sm flex-shrink-0">✓</span>
+            )}
+            
             {/* Section Title */}
-            <h3 className="text-sm font-medium text-gray-900 truncate">
+            <h3 className={`text-sm font-medium truncate ${
+              status === 'fulfilled' ? 'text-green-800' : 'text-gray-900'
+            }`}>
               {title}
             </h3>
-          </div>
-          
-          {/* Status Indicator */}
-          <div className="flex-shrink-0">
-            {status === 'fulfilled' && (
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            )}
-            {status === 'in_progress' && (
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-            )}
-            {status === 'not_fulfilled' && (
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            )}
           </div>
         </div>
       </button>
@@ -132,19 +100,6 @@ const AuditAccordionSection = ({ title, status, items }) => {
             )}
           </div>
           
-          {/* Status Details */}
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-600">Status:</span>
-              <span className={`text-xs font-medium ${
-                status === 'fulfilled' ? 'text-green-600' :
-                status === 'in_progress' ? 'text-yellow-600' :
-                'text-red-600'
-              }`}>
-                {statusConfig.badge}
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </div>

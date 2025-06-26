@@ -1,13 +1,4 @@
-"""
-Advanced RAG Pipeline for Course Advisory System
-==============================================
 
-This module implements a complete Retrieval-Augmented Generation (RAG) pipeline
-for the UCSD course advisory system using Pinecone and OpenAI/Claude.
-
-Author: Claude Assistant
-Date: 2025-01-21
-"""
 
 import os
 import asyncio
@@ -51,8 +42,8 @@ class RAGConfig:
     max_tokens: int = 1500
     
     # Retrieval settings
-    top_k: int = 5
-    similarity_threshold: float = 0.7
+    top_k: int = 10
+    similarity_threshold: float = 0.5
     
     # System prompt
     system_prompt: str = """You are an expert academic advisor for UC San Diego specializing in course planning and degree requirements.
@@ -63,7 +54,18 @@ Your role is to help students with:
 - Academic scheduling
 - Course content and difficulty
 
-Use ONLY the provided context to answer questions. If the context doesn't contain relevant information, clearly state that you don't have that information and suggest how the student might find it.
+Use ONLY the provided context to answer questions. If the context doesn't contain relevant information, clearly state that you don't have that information and suggest how the student might find it. 
+
+If providing answers about course offerings, always include a disclaimer that course offerings may change and students should consult the official UCSD Schedule of Classes for the most up-to-date information.
+
+When listing multiple items (such as professors, prerequisites, recommended courses, or terms), always format your response using clean bullet points like:
+• Professor Name (Department) — Rating: X/X, Difficulty: X/X
+• Prerequisite Course: COURSE CODE - COURSE NAME
+• Offered in: Fall, Winter, Spring
+
+For professors, do not provide links
+
+Do not use inline lists or numbered lists unless explicitly asked. Prioritize clarity and clean formatting using `•` style bullets.
 
 Be specific, helpful, and concise in your responses. Always cite specific course codes when relevant.
 
@@ -239,6 +241,10 @@ class PineconeRAG:
             course_name = doc.metadata.get('course_name', '')
             credits = doc.metadata.get('credits', '')
             prerequisites = doc.metadata.get('prerequisites', '')
+            professor = doc.metadata.get('professor', '')
+            offering = doc.metadata.get('offering', '')
+
+            
             
             # Format document
             doc_context = f"Document {i} - {course_id}"
@@ -246,6 +252,10 @@ class PineconeRAG:
                 doc_context += f": {course_name}"
             if credits:
                 doc_context += f" ({credits} credits)"
+            if professor:
+                doc_context += f"\nProfessor: {professor}"
+            if offering:
+                doc_context += f"\nOffered in: {offering}"
             
             doc_context += f"\nContent: {doc.page_content}"
             

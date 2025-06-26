@@ -1089,15 +1089,15 @@ const FourYearCoursePlanner = () => {
                       )
                     }
                   >
-                    What prerequisites do I need for CS301?
+                    What prerequisites do I need for DSC80?
                   </li>
                   <li
                     className="cursor-pointer hover:underline mt-1"
                     onClick={() =>
-                      setCurrentMessage("Which terms is Math 201 offered in?")
+                      setCurrentMessage("Which terms is CCE1 offered in?")
                     }
                   >
-                    Which terms is Math 201 offered in?
+                    Which terms is CCE1 offered in?
                   </li>
                   <li
                     className="cursor-pointer hover:underline mt-1"
@@ -1116,7 +1116,7 @@ const FourYearCoursePlanner = () => {
                 {chatMessages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`p-2 rounded-lg max-w-[85%] ${
+                    className={`p-2 rounded-lg max-w-[85%] text-sm font-medium whitespace-pre-line${
                       msg.role === "user"
                         ? "ml-auto bg-blue-100 text-blue-800"
                         : "bg-gray-200 text-gray-800"
@@ -1126,7 +1126,7 @@ const FourYearCoursePlanner = () => {
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="bg-gray-200 text-gray-800 p-2 rounded-lg max-w-[85%]">
+                  <div className="bg-gray-200 text-gray-800 p-2 rounded-lg max-w-[85%] text-sm font-medium whitespace-pre-line">
                     <div className="flex space-x-2">
                       <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"></div>
                       <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce delay-75"></div>

@@ -337,16 +337,10 @@ const SidebarAuditTracker = ({ auditData, onAuditDataUpdate }) => {
                 <span className="text-lg font-bold text-green-800">{statusCounts.fulfilled}</span>
               </div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-blue-800">In Progress</span>
-                <span className="text-lg font-bold text-blue-800">{statusCounts.in_progress}</span>
-              </div>
-            </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-red-800">Remaining</span>
-                <span className="text-lg font-bold text-red-800">{statusCounts.not_fulfilled}</span>
+                <span className="text-sm font-medium text-gray-800">Remaining</span>
+                <span className="text-lg font-bold text-gray-800">{statusCounts.not_fulfilled}</span>
               </div>
             </div>
             

@@ -1,60 +1,73 @@
 // Component for displaying audit sections in block format
 
 const AuditSectionBlock = ({ title, status, items }) => {
-  // Define colors based on status
-  const getStatusColors = (status) => {
-    switch (status) {
-      case 'fulfilled':
-        return {
-          bg: 'bg-gray-200',
-          text: 'text-gray-800',
-          border: 'border-gray-300'
-        };
-      case 'not_fulfilled':
-        return {
-          bg: 'bg-red-100',
-          text: 'text-red-800',
-          border: 'border-red-300'
-        };
-      case 'in_progress':
-        return {
-          bg: 'bg-blue-100',
-          text: 'text-blue-800',
-          border: 'border-blue-300'
-        };
-      default:
-        return {
-          bg: 'bg-gray-100',
-          text: 'text-gray-700',
-          border: 'border-gray-200'
-        };
+  // Helper function to determine if a course item is completed based on grade
+  const isCourseCompleted = (item) => {
+    if (!item || typeof item !== 'string') return false;
+    
+    // Skip non-course items
+    if (item.includes('NEEDS:') || item.includes('Available:')) return false;
+    
+    // Look for grade pattern in parentheses: (TERM, GRADE)
+    const gradeMatch = item.match(/\([^,)]+,\s*([^)]+)\)$/);
+    if (!gradeMatch) return false;
+    
+    const grade = gradeMatch[1].trim().toLowerCase();
+    
+    // Course is NOT completed if grade is NR, WIP, or contains "progress"
+    if (!grade || 
+        grade === '' || 
+        grade === 'nr' || 
+        grade === 'wip' ||
+        grade.includes('wip') ||
+        grade.includes('progress')) {
+      return false;
     }
+    
+    // Course is completed if it has any other non-empty grade (A, B+, C, etc.)
+    return true;
   };
 
-  const colors = getStatusColors(status);
-
   return (
-    <div className={`rounded-lg border-2 ${colors.border} ${colors.bg} p-6 mb-4 shadow-sm`}>
+    <div className={`rounded-lg p-6 mb-4 shadow-sm ${
+      status === 'fulfilled' 
+        ? 'bg-green-100 border-2 border-green-200' 
+        : 'bg-white border-2 border-gray-200'
+    }`}>
       {/* Section Header */}
       <div className="mb-4">
-        <h3 className={`text-xl font-bold ${colors.text}`}>
-          {title}
-        </h3>
-        <div className="text-sm text-gray-600 mt-1">
-          Status: {status.replace('_', ' ').toUpperCase()}
+        <div className="flex items-center space-x-2">
+          {status === 'fulfilled' && (
+            <span className="text-green-600 font-bold text-lg">✓</span>
+          )}
+          <h3 className={`text-xl font-bold ${
+            status === 'fulfilled' ? 'text-green-800' : 'text-gray-900'
+          }`}>
+            {title}
+          </h3>
         </div>
       </div>
 
       {/* Course List */}
       <div className="space-y-2">
-        {items.map((item, index) => (
-          <div 
-            key={index}
-            className={`p-3 rounded ${colors.bg} ${colors.text} border ${colors.border} text-sm`}
-          >
-            {item}
-          </div>
-        ))}
+        {items.map((item, index) => {
+          const isCompleted = isCourseCompleted(item);
+          return (
+            <div 
+              key={index}
+              className={`p-3 rounded text-sm ${
+                isCompleted 
+                  ? 'bg-green-100 border border-green-200 text-green-800' 
+                  : 'bg-white border border-gray-200 text-gray-700'
+              }`}
+            >
+              {isCompleted && (
+                <span className="mr-2 text-green-600 font-bold">✓</span>
+              )}
+              {item}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

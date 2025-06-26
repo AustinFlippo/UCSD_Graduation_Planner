@@ -132,14 +132,82 @@ export function getStatusCounts(auditSections) {
 }
 
 /**
- * Calculate completion percentage
+ * Calculate completion percentage based on completed courses
  */
 export function calculateCompletionPercentage(auditSections) {
   if (auditSections.length === 0) return 0;
   
-  const counts = getStatusCounts(auditSections);
-  const completed = counts.fulfilled;
-  const total = auditSections.length;
+  let totalCourses = 0;
+  let completedCourses = 0;
   
-  return Math.round((completed / total) * 100);
+  // Helper function to determine if a course item is completed based on grade
+  const isCourseCompleted = (item) => {
+    if (!item || typeof item !== 'string') return false;
+    
+    // Skip non-course items (NEEDS, Available, etc.)
+    if (item.includes('NEEDS:') || item.includes('Available:')) return false;
+    
+    // Look for grade pattern in parentheses: (TERM, GRADE)
+    const gradeMatch = item.match(/\([^,)]+,\s*([^)]+)\)$/);
+    if (!gradeMatch) return false;
+    
+    const grade = gradeMatch[1].trim().toLowerCase();
+    
+    // Course is NOT completed if grade is NR, WIP, or contains "progress"
+    if (!grade || 
+        grade === '' || 
+        grade === 'nr' || 
+        grade === 'wip' ||
+        grade.includes('wip') ||
+        grade.includes('progress')) {
+      return false;
+    }
+    
+    // Course is completed if it has any other non-empty grade (A, B+, C, etc.)
+    return true;
+  };
+  
+  // Traverse all sections and count courses
+  auditSections.forEach(section => {
+    // Check items array for courses
+    if (section.items && Array.isArray(section.items)) {
+      section.items.forEach(item => {
+        // Skip non-course items
+        if (item.includes('NEEDS:') || item.includes('Available:')) return;
+        
+        // Count this as a course
+        totalCourses++;
+        
+        // Check if it's completed
+        if (isCourseCompleted(item)) {
+          completedCourses++;
+        }
+      });
+    }
+    
+    // Also check other possible nested fields (courses, requirements)
+    if (section.courses && Array.isArray(section.courses)) {
+      section.courses.forEach(course => {
+        totalCourses++;
+        if (course.status === 'complete' || isCourseCompleted(course)) {
+          completedCourses++;
+        }
+      });
+    }
+    
+    if (section.requirements && Array.isArray(section.requirements)) {
+      section.requirements.forEach(req => {
+        totalCourses++;
+        if (req.status === 'complete' || isCourseCompleted(req)) {
+          completedCourses++;
+        }
+      });
+    }
+  });
+  
+  // Return 0 if no courses found
+  if (totalCourses === 0) return 0;
+  
+  // Return percentage rounded to nearest integer
+  return Math.round((completedCourses / totalCourses) * 100);
 }

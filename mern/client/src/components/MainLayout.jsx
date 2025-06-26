@@ -5,6 +5,7 @@ import CoursePlannerContainer from "./planner/CoursePlannerContainer"; // use ex
 import CourseStorage from "./CourseStorage";
 import QuarterlyView from "./QuarterlyView";
 import Header from "./Header";
+import WelcomePopup from "./WelcomePopup";
 
 // Note: Demo data imports are now in LeftSidebar.jsx
 
@@ -33,7 +34,7 @@ const MainLayout = () => {
   }, []);
 
   const pageTitles = {
-    planner: "4-Year Planner",
+    planner: "Triton Planner - Plan Your Future at UCSD",
     storage: "Course Storage",
     quarter: "Quarter View",
   };  
@@ -73,6 +74,9 @@ const MainLayout = () => {
 
         </div>
       </div>
+
+      {/* Welcome Popup - appears on first visit */}
+      <WelcomePopup />
     </div>
   );
 };
