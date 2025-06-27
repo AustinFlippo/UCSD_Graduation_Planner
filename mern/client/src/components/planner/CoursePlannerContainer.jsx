@@ -200,7 +200,7 @@ const CoursePlannerContainer = ({ parsedCourseData = { sections: [], metadata: {
       // Get student name from parsed course data
       const studentName = parsedCourseData?.metadata?.studentName || 'Student';
       
-      const response = await fetch('http://localhost:5050/api/export/google-sheets', {
+      const response = await fetch('https://academic-planner-backend-6pak.onrender.com/api/export/google-sheets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

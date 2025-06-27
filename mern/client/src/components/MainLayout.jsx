@@ -10,7 +10,7 @@ import Maintenance from "./Maintenance";
 
 const MainLayout = () => {
   const [currentPage, setCurrentPage] = useState("planner");
-  const [maintenanceMode, setMaintenanceMode] = useState(true); // toggle flag
+  const [maintenanceMode, setMaintenanceMode] = useState(false); // toggle flag
   
   const [parsedCourseData, setParsedCourseData] = useState({
     sections: [],
