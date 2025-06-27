@@ -51,7 +51,7 @@ const WelcomePopup = () => {
                 Upload Degree Audit HTML
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                Easily upload your degree audit HTML file to extract and visualize your completed and remaining courses automatically.
+                Easily upload your degree audit HTML file to extract and visualize your completed and remaining courses automatically. To get an HTML file of your degree audit, simply open your audit, and save as an html file.
               </p>
             </div>
 
@@ -85,7 +85,7 @@ const WelcomePopup = () => {
                 Search for UCSD courses by name, keyword, or course ID. View course descriptions, enrollment times, and RateMyProfessor scores to make informed choices.
               </p>
               <p className="text-green-700 text-sm mt-2 italic">
-                Tip: Search courses, drag them into the course planner, double click to view more information about the course.
+                
               </p>
             </div>
 
@@ -95,7 +95,7 @@ const WelcomePopup = () => {
                 Course Assistant
               </h3>
               <p className="text-purple-800 leading-relaxed">
-                Ask questions like "What classes fulfill this requirement?" or "Build me a schedule." Get intelligent suggestions based on your data.
+                Ask questions like "What classes fulfill this requirement?" or "When is CCE2 offered?" Get intelligent suggestions based on your data.
               </p>
             </div>
 

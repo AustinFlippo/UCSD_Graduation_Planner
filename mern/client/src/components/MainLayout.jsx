@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import RightSidebar from "./right-sidebar/RightSidebar";
 import LeftSidebar from "./LeftSidebar";
 import CoursePlannerContainer from "./planner/CoursePlannerContainer"; // use existing planner
-import CourseStorage from "./CourseStorage";
-import QuarterlyView from "./QuarterlyView";
 import Header from "./Header";
 import WelcomePopup from "./WelcomePopup";
 
-// Note: Demo data imports are now in LeftSidebar.jsx
+
 
 const MainLayout = () => {
   const [currentPage, setCurrentPage] = useState("planner");
@@ -18,35 +16,15 @@ const MainLayout = () => {
     metadata: {}
   });
 
-  // DEMO: Optionally auto-load Austin's data when component mounts
-  // TODO: Replace this with actual file upload functionality
-  useEffect(() => {
-    // Uncomment the lines below to auto-load Austin's data on page load
-    
-    // const demoData = {
-    //   completed_courses: austinCompletedData.completed_courses || [],
-    //   current_courses: austinCompletedData.current_courses || [],
-    //   requirements: austinRequiredData.requirements || []
-    // };
-    
-    // setParsedCourseData(demoData);
-    
-  }, []);
-
   const pageTitles = {
     planner: "Triton Planner - Plan Your Future at UCSD",
-    storage: "Course Storage",
-    quarter: "Quarter View",
   };  
 
   const renderPage = () => {
     switch (currentPage) {
       case "planner":
         return <CoursePlannerContainer parsedCourseData={parsedCourseData} />;
-      case "storage":
-        return <CourseStorage />;
-      case "quarter":
-        return <QuarterlyView />;
+
       default:
         return <CoursePlannerContainer parsedCourseData={parsedCourseData} />;
     }
