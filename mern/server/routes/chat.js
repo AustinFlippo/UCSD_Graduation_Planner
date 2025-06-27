@@ -1,12 +1,18 @@
 import express from "express";
 import fetch from "node-fetch";
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables
+dotenv.config({ path: path.resolve('../../../.env') });
 
 const router = express.Router();
 
 // Proxy endpoint for chat
 router.post("/", async (req, res) => {
   try {
-    const response = await fetch("https://academic-planner-backend-6pak.onrender.com/chat", {
+    const FASTAPI_URL = process.env.REACT_APP_FASTAPI_URL || 'http://localhost:8000';
+    const response = await fetch(`${FASTAPI_URL}/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

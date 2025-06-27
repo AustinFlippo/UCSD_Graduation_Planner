@@ -10,11 +10,15 @@ and environment validation.
 import os
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 # Load the .env file from the root directory
 root_env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(root_env_path)
+
+env_file = find_dotenv()
+print("Loading .env from:", env_file)
+load_dotenv(env_file, verbose=True)
 
 def check_environment():
     """Check if required environment variables are set."""
@@ -67,11 +71,20 @@ def main():
     try:
         import uvicorn
         
+        # Get port from environment (Render sets PORT)
+        port = int(os.getenv('PORT', 8000))
+        host = os.getenv('HOST', '0.0.0.0')
+        
+        # Environment-aware reload setting
+        reload = os.getenv('NODE_ENV') != 'production'
+        
+        print(f"Starting server on {host}:{port} (reload={reload})")
+        
         uvicorn.run(
             "main:app",
-            host="0.0.0.0",
-            port=8000,
-            reload=True,
+            host=host,
+            port=port,
+            reload=reload,
             log_level="info"
         )
     except KeyboardInterrupt:

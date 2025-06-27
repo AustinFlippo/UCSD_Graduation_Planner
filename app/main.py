@@ -19,9 +19,18 @@ if not root_env_path.exists():
 
 app = FastAPI()
 
+# Environment-specific CORS
+if os.getenv('NODE_ENV') == 'production':
+    allowed_origins = [
+        "https://academic-planner-frontend.onrender.com",
+        "https://academic-planner-backend-6pak.onrender.com"
+    ]
+else:
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -145,10 +154,16 @@ async def upload_degree_audit(pdf: UploadFile = File(...)):
     }
 
 
+@app.head("/")
 @app.get("/")
 async def root():
-    """Health check endpoint."""
-    return {"message": "UCSD Course Advisory API", "status": "running"}
+    """Health check endpoint with HEAD support for load balancers."""
+    return {
+        "message": "UCSD Course Advisory API", 
+        "status": "running",
+        "timestamp": os.getenv('RENDER_SERVICE_VERSION', 'dev'),
+        "service": "fastapi-backend"
+    }
 
 
 @app.get("/health")

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Config Test</title>
+</head>
+<body>
+    <h1>Environment Configuration Test</h1>
+    <div id="config-output"></div>
+    
+    <script type="module">
+        // Import the config
+        import { FASTAPI_URL, EXPRESS_URL } from './mern/client/src/config.js';
+        
+        const output = document.getElementById('config-output');
+        output.innerHTML = `
+            <h2>Current Configuration:</h2>
+            <p><strong>FASTAPI_URL:</strong> ${FASTAPI_URL}</p>
+            <p><strong>EXPRESS_URL:</strong> ${EXPRESS_URL}</p>
+            <p><strong>Environment:</strong> ${import.meta.env.MODE || 'development'}</p>
+        `;
+    </script>
+</body>
+</html>

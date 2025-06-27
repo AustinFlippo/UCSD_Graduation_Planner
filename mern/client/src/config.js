@@ -1,0 +1,2 @@
+export const FASTAPI_URL = import.meta.env.VITE_FASTAPI_URL || import.meta.env.REACT_APP_FASTAPI_URL || 'http://localhost:8000';
+export const EXPRESS_URL = import.meta.env.VITE_EXPRESS_URL || import.meta.env.REACT_APP_EXPRESS_URL || 'http://localhost:5050';

@@ -3,6 +3,7 @@ import CourseSearch from "./CourseSearch";
 import CourseAssistant from "./CourseAssistant";
 import CourseDetails from "./CourseDetails";
 import { debounce } from "lodash";
+import { EXPRESS_URL } from "../../config.js";
 
 const RightSidebar = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +27,7 @@ const RightSidebar = () => {
     try {
       setIsCourseLoading(true);
 
-      const response = await fetch("https://academic-planner-backend-6pak.onrender.com/search-courses", {
+      const response = await fetch(`${EXPRESS_URL}/search-courses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +76,7 @@ const RightSidebar = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://academic-planner-backend-6pak.onrender.com/chat", {
+      const response = await fetch(`${EXPRESS_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
