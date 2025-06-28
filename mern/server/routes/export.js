@@ -4,37 +4,97 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-// Load environment variables from root .env file
-const rootPath = path.resolve(process.cwd(), '../../.env');
-dotenv.config({ path: rootPath });
-console.log('Loading .env from:', rootPath);
+// Load environment variables based on NODE_ENV
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: path.resolve('../../.env.production') });
+} else {
+  dotenv.config({ path: path.resolve('../../.env.development') });
+}
+
+// Fallback to root .env
+dotenv.config({ path: path.resolve('../../.env') });
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configure Google Sheets API using service account
-// const GOOGLE_SERVICE_ACCOUNT_PATH = process.env.GOOGLE_SERVICE_ACCOUNT_PATH || 'credentials/google-service-account.json';
-// const KEYFILE_PATH = path.join(process.cwd(), '..', '..', GOOGLE_SERVICE_ACCOUNT_PATH);
-const KEYFILE_PATH = path.join(__dirname, 'ucsd-planner-463920-0b8bad5f9948.json');
+// Configure Google Sheets API
+let auth = null;
+let sheets = null;
+let drive = null;
 
+// Initialize Google API clients
+function initializeGoogleAPI() {
+  try {
+    // Check if we're in production (Render) with secret files
+    if (process.env.NODE_ENV === 'production') {
+      // On Render, secret files are mounted at /etc/secrets/
+      const KEYFILE_PATH = '/etc/secrets/ucsd-planner-463920-0b8bad5f9948.json';
+      console.log('Production: Looking for service account key at:', KEYFILE_PATH);
+      
+      auth = new google.auth.GoogleAuth({
+        keyFile: KEYFILE_PATH,
+        scopes: [
+          'https://www.googleapis.com/auth/spreadsheets',
+          'https://www.googleapis.com/auth/drive'
+        ]
+      });
+    } else {
+      // Development: Try to use service account from environment variable or local file
+      const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+      
+      if (serviceAccountKey) {
+        // Parse JSON from environment variable
+        const credentials = JSON.parse(serviceAccountKey);
+        auth = new google.auth.GoogleAuth({
+          credentials: credentials,
+          scopes: [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive'
+          ]
+        });
+        console.log('Development: Using service account from environment variable');
+      } else {
+        // Fallback to local file (for development)
+        const localKeyPath = path.join(__dirname, 'ucsd-planner-463920-0b8bad5f9948.json');
+        console.log('Development: Looking for service account key at:', localKeyPath);
+        
+        auth = new google.auth.GoogleAuth({
+          keyFile: localKeyPath,
+          scopes: [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/drive'
+          ]
+        });
+      }
+    }
+    
+    sheets = google.sheets({ version: 'v4' });
+    drive = google.drive({ version: 'v3' });
+    
+    console.log('✅ Google API initialized successfully');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Failed to initialize Google API:', error.message);
+    return false;
+  }
+}
 
-console.log('Looking for service account key at:', KEYFILE_PATH);
-
-const auth = new google.auth.GoogleAuth({
-  keyFile: KEYFILE_PATH,
-  scopes: [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
-  ]
-});
-
-const sheets = google.sheets({ version: 'v4' });
-const drive = google.drive({ version: 'v3' });
+// Initialize on startup
+const isGoogleAPIReady = initializeGoogleAPI();
 
 // POST /api/export/google-sheets
 router.post('/google-sheets', async (req, res) => {
   try {
+    // Check if Google API is ready
+    if (!isGoogleAPIReady || !auth) {
+      return res.status(503).json({ 
+        error: 'Google Sheets service is not available',
+        details: 'Service account credentials not configured properly'
+      });
+    }
+
     const { schedule, yearLabels, studentName } = req.body;
 
     if (!schedule || !yearLabels) {
@@ -216,9 +276,57 @@ router.post('/google-sheets', async (req, res) => {
   } catch (error) {
     console.error('Google Sheets export error:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ 
-      error: 'Failed to export to Google Sheets',
-      details: error.message 
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to export to Google Sheets';
+    let statusCode = 500;
+    
+    if (error.message.includes('auth') || error.message.includes('credential')) {
+      errorMessage = 'Authentication failed - check service account credentials';
+      statusCode = 401;
+    } else if (error.message.includes('quota') || error.message.includes('limit')) {
+      errorMessage = 'Google API quota exceeded - please try again later';
+      statusCode = 429;
+    } else if (error.message.includes('permission')) {
+      errorMessage = 'Insufficient permissions to create Google Sheets';
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// Health check endpoint for Google Sheets integration
+router.get('/health', async (req, res) => {
+  try {
+    if (!isGoogleAPIReady || !auth) {
+      return res.status(503).json({
+        status: 'unhealthy',
+        service: 'google-sheets',
+        error: 'Google API not initialized',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Test authentication
+    const authClient = await auth.getClient();
+    
+    res.json({
+      status: 'healthy',
+      service: 'google-sheets',
+      authenticated: true,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      service: 'google-sheets',
+      error: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });

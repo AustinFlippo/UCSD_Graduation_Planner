@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import CoursePlanner from "./CoursePlanner";
 import { processAuditForPlanner } from "../../utils/auditCoursePlanner";
+import { EXPRESS_URL } from "../../config.js";
 
 const CoursePlannerContainer = ({ parsedCourseData = { sections: [], metadata: {} } }) => {
   const [schedule, setSchedule] = useState(
@@ -200,7 +201,7 @@ const CoursePlannerContainer = ({ parsedCourseData = { sections: [], metadata: {
       // Get student name from parsed course data
       const studentName = parsedCourseData?.metadata?.studentName || 'Student';
       
-      const response = await fetch('https://academic-planner-backend-6pak.onrender.com/api/export/google-sheets', {
+      const response = await fetch(`${EXPRESS_URL}/api/export/google-sheets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

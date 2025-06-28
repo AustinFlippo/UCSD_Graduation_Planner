@@ -1,4 +1,12 @@
 {
+  "name": "ucsd-graduation-planner",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "cd mern/client && npm install && npm run build",
+    "start": "cd mern/client && npm run preview",
+    "dev": "cd mern/client && npm run dev"
+  },
   "dependencies": {
     "googleapis": "^150.0.1"
   }
