@@ -5,8 +5,14 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Import the new RAG system
-from rag_pipeline import create_rag_system
+# Import the new RAG system (optional)
+try:
+    from rag_pipeline import create_rag_system
+    RAG_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: RAG pipeline not available: {e}")
+    create_rag_system = None
+    RAG_AVAILABLE = False
 
 # Load environment variables from root .env file
 root_env_path = Path(__file__).parent.parent / '.env'
@@ -23,7 +29,9 @@ app = FastAPI()
 if os.getenv('NODE_ENV') == 'production':
     allowed_origins = [
         "https://academic-planner-frontend.onrender.com",
-        "https://academic-planner-backend-6pak.onrender.com"
+        "https://academic-planner-backend-6pak.onrender.com",
+        "https://www.tritonplanner.com",
+        "https://tritonplanner.com"
     ]
 else:
     allowed_origins = ["*"]
@@ -42,6 +50,9 @@ rag_system = None
 def get_rag_system():
     """Lazy initialization of RAG system to handle startup errors gracefully."""
     global rag_system
+    if not RAG_AVAILABLE:
+        return None
+        
     if rag_system is None:
         try:
             rag_system = create_rag_system(
@@ -51,6 +62,7 @@ def get_rag_system():
                 llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini-2024-07-18")
             )
         except Exception as e:
+            print(f"Error initializing RAG system: {e}")
             return None
     return rag_system
 

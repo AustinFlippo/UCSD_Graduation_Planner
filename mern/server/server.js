@@ -23,10 +23,31 @@ const app = express();
 
 // Environment-specific CORS
 if (process.env.NODE_ENV === 'production') {
+  const allowedOrigins = [
+    "https://academic-planner-frontend.onrender.com",
+    "https://www.tritonplanner.com",
+    "https://tritonplanner.com"
+  ];
+  
+  // Add custom frontend URL from environment if provided
+  if (process.env.REACT_APP_FRONTEND_URL) {
+    allowedOrigins.push(process.env.REACT_APP_FRONTEND_URL);
+  }
+  
   app.use(cors({
-    origin: process.env.REACT_APP_FRONTEND_URL || "https://academic-planner-frontend.onrender.com",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log(`CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
   }));
 } else {

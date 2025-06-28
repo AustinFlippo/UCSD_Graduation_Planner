@@ -69,16 +69,23 @@ def main():
     
     # Import and start server
     try:
+        print("💿 Importing uvicorn...")
         import uvicorn
         
         # Get port from environment (Render sets PORT)
         port = int(os.getenv('PORT', 8000))
         host = os.getenv('HOST', '0.0.0.0')
         
-        # Environment-aware reload setting
-        reload = os.getenv('NODE_ENV') != 'production'
+        # Environment-aware reload setting (never reload in production)
+        reload = os.getenv('NODE_ENV') != 'production' and os.getenv('RENDER') != 'true'
         
-        print(f"Starting server on {host}:{port} (reload={reload})")
+        print(f"🚀 Starting server on {host}:{port} (reload={reload})")
+        print(f"🌍 Environment: {os.getenv('NODE_ENV', 'development')}")
+        
+        # Test import of main app before starting server
+        print("📦 Testing main app import...")
+        from main import app
+        print("✅ Main app imported successfully")
         
         uvicorn.run(
             "main:app",
@@ -88,8 +95,17 @@ def main():
             log_level="info"
         )
     except KeyboardInterrupt:
+        print("⚡ Server stopped by user")
         pass
-    except Exception:
+    except ImportError as e:
+        print(f"❌ Import error: {e}")
+        print(f"📁 Current working directory: {os.getcwd()}")
+        print(f"📁 Files in current directory: {os.listdir('.')}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":
