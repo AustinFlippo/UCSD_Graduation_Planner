@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "cd mern/client && npm install && npm run build",
-    "start": "cd mern/client && npm run preview",
-    "dev": "cd mern/client && npm run dev"
+    "build": "npm install --prefix ./mern/client && npm run build --prefix ./mern/client",
+    "start": "npm run preview --prefix ./mern/client",
+    "dev": "npm run dev --prefix ./mern/client",
+    "install-client": "npm install --prefix ./mern/client",
+    "postinstall": "npm run install-client"
   },
   "dependencies": {
     "googleapis": "^150.0.1"

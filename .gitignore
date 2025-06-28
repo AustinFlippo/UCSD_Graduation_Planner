@@ -11,6 +11,8 @@
 app/.env
 mern/server/config.env
 mern/client/.env
+mern/client/.env.development
+mern/client/.env.production
 
 # Google Service Account Keys (CRITICAL - Contains Private Keys)
 credentials/
