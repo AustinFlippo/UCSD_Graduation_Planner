@@ -177,6 +177,10 @@ async def root():
         "service": "fastapi-backend"
     }
 
+@app.head("/health")
+async def health_head():
+    """Simple health check responding to HEAD (no body)."""
+    return {"status": "OK"}  # GET would include full health_status
 
 @app.get("/health")
 async def health_check():
