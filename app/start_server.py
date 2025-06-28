@@ -71,18 +71,39 @@ def main():
     try:
         print("💿 Importing uvicorn...")
         import uvicorn
+
+
+        
+        ###OLD PORT SETTING
         
         # Get port from environment (Render sets PORT)
-        port_env = os.getenv('PORT', '8000')
-        try:
-            # Handle empty string or invalid PORT values
-            port = int(port_env) if port_env and port_env.strip() else 8000
-        except (ValueError, TypeError):
-            print(f"⚠️  Invalid PORT value '{port_env}', using default 8000")
-            port = 8000
+        # port_env = os.getenv('PORT', '8000')
+        # try:
+        #     # Handle empty string or invalid PORT values
+        #     port = int(port_env) if port_env and port_env.strip() else 8000
+        # except (ValueError, TypeError):
+        #     print(f"⚠️  Invalid PORT value '{port_env}', using default 8000")
+        #     port = 8000
             
-        host = os.getenv('HOST', '0.0.0.0')
+        # host = os.getenv('HOST', '0.0.0.0')
+
+
+
+        #NEW PORT SETTING
+
+        port_env = os.getenv('PORT')
+        if not port_env or not port_env.strip():
+            print("❌ No PORT provided by Render. Exiting to prevent binding errors.")
+            sys.exit(1)
         
+        try:
+            port = int(port_env)
+        except (ValueError, TypeError):
+            print(f"⚠️ Invalid PORT '{ port_env }', exiting.")
+            sys.exit(1)
+        
+        host = "0.0.0.0"
+
         # Environment-aware reload setting (never reload in production)
         reload = os.getenv('NODE_ENV') != 'production' and os.getenv('RENDER') != 'true'
         
