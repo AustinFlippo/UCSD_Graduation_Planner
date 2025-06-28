@@ -73,12 +73,24 @@ def main():
         import uvicorn
         
         # Get port from environment (Render sets PORT)
-        port = int(os.getenv('PORT', 8000))
+        port_env = os.getenv('PORT', '8000')
+        try:
+            # Handle empty string or invalid PORT values
+            port = int(port_env) if port_env and port_env.strip() else 8000
+        except (ValueError, TypeError):
+            print(f"⚠️  Invalid PORT value '{port_env}', using default 8000")
+            port = 8000
+            
         host = os.getenv('HOST', '0.0.0.0')
         
         # Environment-aware reload setting (never reload in production)
         reload = os.getenv('NODE_ENV') != 'production' and os.getenv('RENDER') != 'true'
         
+        print(f"🔍 Debug info:")
+        print(f"   PORT env var: '{os.getenv('PORT', 'NOT_SET')}'")
+        print(f"   HOST env var: '{os.getenv('HOST', 'NOT_SET')}'")
+        print(f"   NODE_ENV: '{os.getenv('NODE_ENV', 'NOT_SET')}'")
+        print(f"   RENDER: '{os.getenv('RENDER', 'NOT_SET')}'")
         print(f"🚀 Starting server on {host}:{port} (reload={reload})")
         print(f"🌍 Environment: {os.getenv('NODE_ENV', 'development')}")
         
